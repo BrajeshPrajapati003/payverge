@@ -1,22 +1,28 @@
 package com.payverge.transaction_service.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDateTime;
+import jakarta.validation.constraints.Positive;
+
+
 
 @Entity
 @Table(name = "transaction")
+
 public class Transaction {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "sender_name", nullable = false)
-    private String senderName;
+    @Column(nullable = false)
+    private Long senderId;
 
-    @Column(name = "receiver_name", nullable = false)
-    private String receiverName;
+    @Column(nullable = false)
+    private Long receiverId;
+
 
     @Column(nullable = false)
     @Positive(message = "Amount must be positive")
@@ -28,54 +34,29 @@ public class Transaction {
     @Column(nullable = false)
     private String status;
 
-    // Default Constructor
-    public Transaction(){}
+    public Transaction() {}
 
-    // All-args Constructor
-    public Transaction(Long id, String senderName, String receiverName, Double amount,
-                       LocalDateTime timestamp, String status){
-        this.id = id;
+    public Transaction(Long senderId, Long receiverId,
+                       String senderNameSnapshot, String receiverNameSnapshot,
+                       Double amount, LocalDateTime timestamp, String status) {
+        this.senderId = senderId;
+        this.receiverId = receiverId;
         this.amount = amount;
-        this.receiverName = receiverName;
+        this.timestamp = timestamp;
         this.status = status;
-        this.timestamp = timestamp;
-        this.senderName = senderName;
     }
 
-    // Getters and Setters
-
-    public String getSenderName() {
-        return senderName;
+    @PrePersist
+    public void prePersist() {
+        if (timestamp == null) {
+            timestamp = LocalDateTime.now();
+        }
+        if (status == null) {
+            status = "PENDING";
+        }
     }
 
-    public void setSenderName(String senderName) {
-        this.senderName = senderName;
-    }
-
-    public String getReceiverName() {
-        return receiverName;
-    }
-
-    public void setReceiverName(String receiverName) {
-        this.receiverName = receiverName;
-    }
-
-    public Double getAmount() {
-        return amount;
-    }
-
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
-
+    // Getters and setters
     public Long getId() {
         return id;
     }
@@ -84,31 +65,47 @@ public class Transaction {
         this.id = id;
     }
 
+    public Long getSenderId() {
+        return senderId;
+    }
+    public void setSenderId(Long senderId) {
+        this.senderId = senderId;
+    }
+
+    public Long getReceiverId() {
+        return receiverId;
+    }
+    public void setReceiverId(Long receiverId) {
+        this.receiverId = receiverId;
+    }
+
+    public Double getAmount() {
+        return amount;
+    }
+    public void setAmount(Double amount) {
+        this.amount = amount;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
+    }
+
     public String getStatus() {
         return status;
     }
-
     public void setStatus(String status) {
         this.status = status;
     }
 
-    // Lifecycle callback to set default values before persist
-    @PrePersist
-    public void prePersist(){
-        if(timestamp == null){
-            timestamp = LocalDateTime.now();
-        }
-        if(status == null){
-            status = "PENDING";
-        }
-    }
-
     @Override
-    public String toString(){
+    public String toString() {
         return "Transaction{" +
                 "id=" + id +
-                ", senderName='" + senderName + '\'' +
-                ", receiverName='" + receiverName + '\'' +
+                ", senderId=" + senderId +
+                ", receiverId=" + receiverId +
                 ", amount=" + amount +
                 ", timestamp=" + timestamp +
                 ", status='" + status + '\'' +
