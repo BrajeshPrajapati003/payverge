@@ -3,25 +3,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-
     <groupId>com.payverge</groupId>
     <artifactId>paypal-clone</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
-
-<!--    <url/>-->
-<!--    <licenses>-->
-<!--        <license/>-->
-<!--    </licenses>-->
-<!--    <developers>-->
-<!--        <developer/>-->
-<!--    </developers>-->
-<!--    <scm>-->
-<!--        <connection/>-->
-<!--        <developerConnection/>-->
-<!--        <tag/>-->
-<!--        <url/>-->
-<!--    </scm>-->
 
     <properties>
         <java.version>17</java.version>
@@ -30,6 +15,8 @@
     <modules>
         <module>user-service</module>
         <module>transaction-service</module>
+        <module>notification-service</module>
+<!--        <module>reward-service</module>-->
         <!--  And your other services here   -->
     </modules>
 
