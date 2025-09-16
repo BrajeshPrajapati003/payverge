@@ -7,12 +7,14 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="transaction-service" />
+        <module name="notification-service" />
         <module name="user-service" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="notification-service" options="-parameters" />
       <module name="transaction-service" options="-parameters" />
       <module name="user-service" options="-parameters" />
     </option>
