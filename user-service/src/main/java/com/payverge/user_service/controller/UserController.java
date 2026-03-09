@@ -32,3 +32,32 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 }
+
+//
+//
+//
+//@RestController
+//@RequestMapping("/api/users/")
+//public class UserController {
+//
+//    private UserService userService;
+//    public UserController(UserService userService){
+//        this.userService = userService;
+//    }
+//
+//    @PostMapping
+//    public ResponseEntity<User> createUser(@RequestBody User user){
+//        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(user));
+//    }
+//
+//    @GetMapping("/{id}")
+//    public ResponseEntity<User> getUserById(@PathVariable Long id){
+//        return userService.getUserById((id)).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+//    }
+//
+//    @GetMapping("/all")
+//    public ResponseEntity<List<User>> getAllUsers() {
+//        return ResponseEntity.ok(userService.getAllUsers());
+//    }
+//
+//}
