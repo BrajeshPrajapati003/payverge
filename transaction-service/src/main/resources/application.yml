@@ -4,6 +4,9 @@ server:
 spring:
   application:
     name: transaction-service
+  output:
+    ansi:
+      enabled: always
 
   kafka:
     bootstrap-servers: localhost:9092
@@ -23,3 +26,4 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
