@@ -11,13 +11,12 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.List;
 
 @Component
 public class JWTRequestFilter extends OncePerRequestFilter {
-    private JWTUtil jwtUtil;
+    private final JWTUtil jwtUtil;
 
     public JWTRequestFilter(JWTUtil jwtUtil){
         this.jwtUtil = jwtUtil;
@@ -25,35 +24,36 @@ public class JWTRequestFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-        final String authorizationHeader = request.getHeader("Authorization");
-        String username = null;
+        final String authHeader = request.getHeader("Authorization");
         String jwt = null;
+        String username = null;
 
-        if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
-            jwt = authorizationHeader.substring(7);
-
-            if(jwt == null || jwt.isBlank()){
-                chain.doFilter(request, response);
-                return; // Skip processing if token empty
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            jwt = authHeader.substring(7);
+            if (!jwt.isBlank()) {
+                try {
+                    username = jwtUtil.extractUsername(jwt);
+                    if (jwtUtil.validateToken(jwt, username)) {
+                        String role = jwtUtil.extractRole(jwt);
+                        UsernamePasswordAuthenticationToken authToken =
+                                new UsernamePasswordAuthenticationToken(
+                                        username,
+                                        null,
+                                        List.of(new SimpleGrantedAuthority(role))
+                                );
+                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                    }
+                } catch (Exception e) {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT Token");
+                    return; // stop processing
+                }
             }
-            try{
-                username = jwtUtil.extractUsername(jwt);
-                // Only extract role if JWT is valid and present
-                String role = jwtUtil.extractRole(jwt);
-                // Use role for authorities as needed
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(username, null, List.of(new SimpleGrantedAuthority(role))
-                        );
-
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-            }catch(Exception e) {
-                // log error if you want
-                System.out.println("JWT Request Filter - do filter internal failure");
-            }
-        }else{
-            chain.doFilter(request, response);
-            return;
         }
+
+        // Continue the filter chain (always call at the end)
+        chain.doFilter(request, response);
+
     }
+
 }

@@ -27,3 +27,7 @@ spring:
       ddl-auto: update
     show-sql: true
 
+
+  cloud:
+    compatibility-verifier:
+      enabled: false
