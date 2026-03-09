@@ -1,10 +1,17 @@
-spring.application.name=user-service
+spring:
+  application:
+    name: user-service
+  output:
+    ansi:
+      enabled: always
+
+server:
+  port: 8081
 
 # Always check your logs
-logging.level.org.springframework.security=DEBUG
-logging.level.org.springframework.web=DEBUG
-
-
-
-# Always use ANSI color codes in logs
-spring.output.ansi.enabled=ALWAYS
+logging:
+  level:
+    org:
+    springframework:
+      security: DEBUG
+      web: DEBUG
