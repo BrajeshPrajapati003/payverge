@@ -64,6 +64,8 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
             // Add user email to headers for downstream services
             var mutatedRequest = exchange.getRequest().mutate()
                     .header("X-User-Email", claims.getSubject())
+                    .header("X-ser-Id", claims.get("user-id", String.class))
+                    .header("X-User-Role", claims.get("role", String.class))
                     .build();
 
             exchange = exchange.mutate().request(mutatedRequest).build();
