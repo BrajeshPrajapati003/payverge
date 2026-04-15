@@ -26,5 +26,5 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
-        spring.json.trusted.packages: "com.paypal.notification_service.entity"
+        spring.json.trusted.packages: "com.payverge.notification_service.entity"
         spring.json.value.default.type: com.paypal.notification_service.entity.Transaction

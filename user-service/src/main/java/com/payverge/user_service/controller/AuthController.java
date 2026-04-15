@@ -7,7 +7,7 @@ import com.payverge.user_service.entity.User;
 import com.payverge.user_service.repository.UserRepository;
 import com.payverge.user_service.service.UserService;
 import com.payverge.user_service.util.JWTUtil;
-import org.apache.coyote.Response;
+//import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.Map;
+//import java.util.HashMap;
+//import java.util.Map;
 import java.util.Optional;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.web.bind.annotation.*;
+//import org.springframework.web.bind.annotation.*;
 
 
 @RestController

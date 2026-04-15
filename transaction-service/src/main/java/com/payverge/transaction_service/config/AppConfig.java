@@ -10,4 +10,7 @@ public class AppConfig {
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
+
+//    restTemplate :
+//    synchronous request-response flow, simplicity > complexity, if you need direct service-to-service communication
 }

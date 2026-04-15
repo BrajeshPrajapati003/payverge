@@ -12,7 +12,7 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("PayPal Clone Wallet Service API")
+                        .title("PayVerge Wallet Service API")
                         .version("1.0")
                         .description("APIs for wallet management"));
     }

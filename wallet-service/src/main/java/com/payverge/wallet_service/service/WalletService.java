@@ -12,6 +12,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import com.payverge.wallet_service.repository.WalletHoldRepository;
 
+import java.util.Optional;
+
 
 @Service
 public class WalletService {
@@ -29,13 +31,51 @@ public class WalletService {
 
     @Transactional
     public WalletResponse createWallet(CreateWalletRequest request) {
+
+        // 🔍 Check if wallet already exists
+        Optional<Wallet> existingWallet = walletRepository.findByUserId(request.getUserId());
+
+        if (existingWallet.isPresent()) {
+            Wallet wallet = existingWallet.get();
+
+            return new WalletResponse(
+                    wallet.getId(),
+                    wallet.getUserId(),
+                    wallet.getCurrency(),
+                    wallet.getBalance(),
+                    wallet.getAvailableBalance()
+            );
+        }
+
+        // ✅ Create new wallet only if not exists -> Idempotent behavior
         Wallet wallet = new Wallet(request.getUserId(), request.getCurrency());
         Wallet saved = walletRepository.save(wallet);
-        return new WalletResponse(
-                saved.getId(), saved.getUserId(), saved.getCurrency(),
-                saved.getBalance(), saved.getAvailableBalance()
 
+        return new WalletResponse(
+                saved.getId(),
+                saved.getUserId(),
+                saved.getCurrency(),
+                saved.getBalance(),
+                saved.getAvailableBalance()
         );
+
+//        If two requests hit simultaneously: both may pass findByUserId() -> so add DB + fallback protection
+
+//        try {
+//            return createWalletLogic(request);
+//        } catch (DataIntegrityViolationException ex) {
+//            // 🔁 fallback: fetch existing wallet
+//            Wallet wallet = walletRepository.findByUserId(request.getUserId())
+//                    .orElseThrow(() -> ex);
+//
+//            return new WalletResponse(
+//                    wallet.getId(),
+//                    wallet.getUserId(),
+//                    wallet.getCurrency(),
+//                    wallet.getBalance(),
+//                    wallet.getAvailableBalance()
+//            );
+//        }
     }
 
     @Transactional

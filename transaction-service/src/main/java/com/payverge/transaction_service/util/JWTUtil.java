@@ -13,7 +13,9 @@ import java.util.Map;
 
 @Component
 public class JWTUtil {
-    private static final String SECRET = "secret123secret123secret123secret12";
+    private static final String SECRET = System.getenv("JWT_SECRET") != null
+            ? System.getenv("JWT_SECRET")
+            : "secret123Secret123Secret123secret123Secret123Secret123";
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET.getBytes());

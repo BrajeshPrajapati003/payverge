@@ -15,8 +15,8 @@ spring:
     console:
       enabled: true
 
-  jwt:
-    secret: my-super-secret-key-that-you-never-share
+#  jwt:
+#    secret: secret123Secret123Secret123secret123Secret123Secret123
 
   output:
     ansi:

@@ -21,7 +21,7 @@ public class KafkaConsumer {
         JsonDeserializer<Transaction> deserializer = new JsonDeserializer<>(Transaction.class);
         deserializer.setRemoveTypeHeaders((false));
         deserializer.setUseTypeMapperForKey(true);
-        deserializer.addTrustedPackages("com.paypal.transaction-service.entity");
+        deserializer.addTrustedPackages("com.payverge.transaction-service.entity");
 
         Map<String, Object> props = new HashMap<>();
 

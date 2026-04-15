@@ -8,7 +8,10 @@ import java.security.Key;
 
 public class JwtUtil {
 
-    private static final String SECRET = "secret123Secret123Secret123secret123Secret123Secret123";
+    private static final String SECRET =
+            System.getenv("JWT_SECRET") != null
+                    ? System.getenv("JWT_SECRET")
+                    : "secret123Secret123Secret123secret123Secret123Secret123";
 
     private static Key getSigninKey() {
         return Keys.hmacShaKeyFor(SECRET.getBytes());
