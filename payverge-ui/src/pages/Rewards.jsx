@@ -18,7 +18,7 @@ const Rewards = () => {
       const tokenPayload = JSON.parse(atob(token.split('.')[1]));
       const userId = tokenPayload.userId;
 
-      const response = await fetch(`http://localhost:8083/api/rewards/user/${userId}`, {
+      const response = await fetch(`http://localhost:8080/api/rewards/user/${userId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

@@ -62,7 +62,7 @@ const Dashboard = () => {
       setUser(userData);
 
       // Fetch wallet balance
-      const walletRes = await fetch(`http://localhost:8088/api/v1/wallets/${userId}`, {
+      const walletRes = await fetch(`http://localhost:8080/api/v1/wallets/${userId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -94,7 +94,7 @@ const Dashboard = () => {
       // Fetch notifications from correct port (8084)
       let userNotifications = [];
       try {
-        const notificationsRes = await fetch(`http://localhost:8084/api/notify/${userId}`, {
+        const notificationsRes = await fetch(`http://localhost:8080/api/notify/${userId}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -114,7 +114,7 @@ const Dashboard = () => {
       // Fetch rewards from correct port (8083)
       let rewardsCount = 0;
       try {
-        const rewardsRes = await fetch(`http://localhost:8083/api/rewards/user/${userId}`, {
+        const rewardsRes = await fetch(`http://localhost:8080/api/rewards/user/${userId}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -154,7 +154,7 @@ const Dashboard = () => {
       const tokenPayload = JSON.parse(atob(token.split('.')[1]));
       const userId = tokenPayload.userId;
 
-      const response = await fetch(`http://localhost:8084/api/notify/${userId}`, {
+      const response = await fetch(`http://localhost:8080/api/notify/${userId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -171,7 +171,7 @@ const Dashboard = () => {
           
           // Show browser notification
           if ('Notification' in window && Notification.permission === 'granted') {
-            new Notification('PayFlow - New Notification', {
+            new Notification('PayVerge - New Notification', {
               body: latestNotification.message,
               icon: '/logo.png',
               badge: '/logo.png'
@@ -331,10 +331,10 @@ const Dashboard = () => {
           <h2>
             <img 
               src="/assets/logo.png" 
-              alt="PayFlow Logo" 
+              alt="PayVerge Logo" 
               className="brand-logo" 
             />
-            PayFlow
+            PayVerge
           </h2>
         </div>
 

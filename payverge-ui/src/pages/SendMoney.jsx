@@ -68,7 +68,7 @@ const SendMoney = () => {
   const fetchUserRewards = async (userId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8083/api/rewards/user/${userId}`, {
+      const response = await fetch(`http://localhost:8080/api/rewards/user/${userId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

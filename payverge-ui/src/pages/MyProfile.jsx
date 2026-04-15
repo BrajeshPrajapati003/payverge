@@ -59,7 +59,7 @@ const MyProfile = () => {
       const tokenPayload = JSON.parse(atob(token.split('.')[1]));
       const userId = tokenPayload.userId;
 
-      const response = await fetch(`http://localhost:8088/api/v1/wallets/${userId}`, {
+      const response = await fetch(`http://localhost:8080/api/v1/wallets/${userId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -374,7 +374,7 @@ const MyProfile = () => {
             <div className="tab-content">
               <div className="content-header">
                 <h2>Preferences</h2>
-                <p>Customize your PayFlow experience</p>
+                <p>Customize your PayVerge experience</p>
               </div>
 
               <div className="preferences-settings">
@@ -403,7 +403,7 @@ const MyProfile = () => {
                 <div className="preference-item">
                   <div className="preference-info">
                     <h4>Marketing Emails</h4>
-                    <p>Receive offers and promotions from PayFlow</p>
+                    <p>Receive offers and promotions from PayVerge</p>
                   </div>
                   <label className="toggle-switch">
                     <input type="checkbox" />
