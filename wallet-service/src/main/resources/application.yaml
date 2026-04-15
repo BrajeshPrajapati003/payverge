@@ -23,5 +23,5 @@ spring:
 spring.h2.console.enabled: true
 spring.h2.console.path: /h2-console
 
-server:
+server: # wallet-service
   port: 8088

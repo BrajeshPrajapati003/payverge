@@ -1,4 +1,4 @@
-server:
+server: # api gateway
   port: 8080
 
 spring:
@@ -11,7 +11,7 @@ spring:
     show-sql: true
 
   redis:
-    host: localhost
+    host: redis
     port: 6379
 
   cloud:
@@ -38,13 +38,13 @@ spring:
       routes:
         # user micro service - NO rate limiting for auth endpoints
         - id: user-service
-          uri: http://localhost:8081
+          uri: http://user-service:8081
           predicates:
             - Path=/auth/**, /api/users/**
 
         # Transaction microservice - WITH rate limiting
         - id: transaction-service
-          uri: http://localhost:8082
+          uri: http://transaction-service:8082
           predicates:
             - Path=/api/transactions/**
           filters:
@@ -56,7 +56,7 @@ spring:
 
         # Reward Service - WITH rate limiting
         - id: reward-service
-          uri: http://localhost:8085
+          uri: http://reward-service:8085
           predicates:
             - Path=/api/rewards/**
           filters:
@@ -68,7 +68,7 @@ spring:
 
         # Notification Service - WITH rate limiting
         - id: notification-service
-          uri: http://localhost:8084
+          uri: http://notification-service:8084
           predicates:
             - Path=/api/notify/**
           filters:

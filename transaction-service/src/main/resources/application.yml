@@ -1,4 +1,4 @@
-server:
+server: # transaction-service
   port: 8082
 
 spring:
