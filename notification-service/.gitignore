@@ -1,3 +1,32 @@
+# Environment
+.env
+.env.*
+
+# Uploads
+uploads/
+
+# IntelliJ
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# Maven
+target/
+
+# Gradle
+build/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+
+
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
