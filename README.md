@@ -1,120 +1,229 @@
+
 ```markdown
-# 💸 Payverge
+# 💸 PayVerge
 
-**Payverge** is a distributed digital payment platform built with **Java, Spring Boot, React, Apache Kafka, and Docker**.
+**PayVerge** is a distributed digital payment platform built with **Java, Spring Boot, React, Apache Kafka, Redis, and Docker**.
 
-The project simulates a digital payment system using a **microservices architecture**, combining synchronous transaction processing with asynchronous event-driven processing for rewards and notifications.
+The project demonstrates how a digital payment system can be designed using a **microservices architecture**, combining synchronous communication for critical payment operations with asynchronous event-driven processing for rewards and notifications.
 
 ---
 
-## 🏗️ Architecture
+## 🚀 Overview
+
+PayVerge provides a simplified digital wallet and payment experience where users can:
+
+- Create an account
+- Authenticate using JWT
+- Manage their digital wallet
+- Add funds
+- Send money to other users
+- View transaction history
+- Receive transaction notifications
+- Earn rewards from transactions
+
+The frontend communicates with the backend through a centralized **API Gateway**, while backend services communicate synchronously through REST APIs and asynchronously through Apache Kafka.
+
+---
+
+# 🏗️ Architecture
 
 ```text
-                         ┌──────────────────────┐
-                         │     React + Vite     │
-                         │      Frontend        │
-                         └──────────┬───────────┘
-                                    │
-                              HTTP :8080
-                                    │
-                                    ▼
-                         ┌──────────────────────┐
-                         │     API Gateway      │
-                         └──────────┬───────────┘
-                                    │
-                 ┌──────────────────┼──────────────────┐
-                 │                  │                  │
-                 ▼                  ▼                  ▼
-          ┌─────────────┐   ┌──────────────┐   ┌─────────────┐
-          │ User Service│   │ Transaction  │   │   Wallet    │
-          │             │   │   Service    │   │   Service   │
-          └─────────────┘   └──────┬───────┘   └─────────────┘
-                                   │
-                                   │ Transaction Event
-                                   ▼
-                            ┌─────────────┐
-                            │    Kafka    │
-                            │txn-initiated│
-                            └──────┬──────┘
-                                   │
-                     ┌─────────────┴─────────────┐
-                     ▼                           ▼
-              ┌─────────────┐             ┌───────────────┐
-              │   Reward    │             │ Notification  │
-              │   Service   │             │    Service    │
-              └─────────────┘             └───────────────┘
+                         ┌──────────────────────────┐
+                         │       React + Vite       │
+                         │        Frontend          │
+                         │         :5173            │
+                         └────────────┬─────────────┘
+                                      │
+                                      │ HTTP
+                                      ▼
+                         ┌──────────────────────────┐
+                         │       API Gateway        │
+                         │          :8080           │
+                         │                          │
+                         │ JWT Authentication       │
+                         │ Request Routing          │
+                         │ Rate Limiting            │
+                         └────────────┬─────────────┘
+                                      │
+             ┌────────────────────────┼────────────────────────┐
+             │                        │                        │
+             ▼                        ▼                        ▼
+      ┌─────────────┐         ┌──────────────┐         ┌─────────────┐
+      │    User     │         │   Wallet     │         │ Transaction │
+      │   Service   │         │   Service    │         │   Service   │
+      │    :8081    │         │    :8088     │         │    :8082    │
+      └─────────────┘         └──────────────┘         └──────┬──────┘
+                                                               │
+                                                               │
+                                                        Transaction Event
+                                                               │
+                                                               ▼
+                                                       ┌──────────────┐
+                                                       │    Kafka     │
+                                                       │txn-initiated │
+                                                       └──────┬───────┘
+                                                              │
+                                           ┌───────────────────┴───────────────────┐
+                                           │                                       │
+                                           ▼                                       ▼
+                                   ┌─────────────┐                         ┌────────────────┐
+                                   │   Reward    │                         │  Notification  │
+                                   │   Service   │                         │    Service     │
+                                   │    :8089    │                         │     :8084      │
+                                   └─────────────┘                         └────────────────┘
+
+
+                         ┌──────────────────────────┐
+                         │          Redis           │
+                         │          :6379           │
+                         │                          │
+                         │ Gateway Rate Limiting    │
+                         └──────────────────────────┘
 ```
 
 ---
 
-## ✨ Features
+# 🧩 Microservices
 
-- Microservices-based payment architecture
-- API Gateway as the central backend entry point
-- JWT-based authentication with Spring Security
-- BCrypt password hashing
-- User management
-- Digital wallet management
-- Transaction processing
-- Wallet hold, capture, and release workflow
-- Idempotent transaction handling
-- Compensating actions for failed distributed operations
-- Kafka-based event-driven processing
-- Automatic reward processing
-- Transaction notification processing
-- Dockerized Kafka and ZooKeeper infrastructure
-- React-based frontend with client-side routing
+| Service |   Port | Responsibility |
+|---|-------:|---|
+| **API Gateway** | `8080` | Central entry point, routing, JWT filtering and rate limiting |
+| **User Service** | `8081` | User registration, authentication and user management |
+| **Transaction Service** | `8082` | Payment orchestration and transaction lifecycle |
+| **Notification Service** | `8084` | Transaction notifications |
+| **Reward Service** | `8089` | Reward processing |
+| **Wallet Service** | `8088` | Wallet balances, holds, credits and debits |
 
 ---
 
-## 💳 Transaction Processing
+# 🌐 API Gateway
 
-A payment follows a controlled transaction lifecycle:
+The frontend communicates with the **API Gateway on port `8080`** rather than directly accessing individual microservices.
+
+All application APIs follow the `/api/v1/**` convention.
 
 ```text
-                         Transaction Request
-                                  │
-                                  ▼
-                              PENDING
-                                  │
-                                  ▼
-                         Place Wallet Hold
-                                  │
-                                  ▼
-                         Verify Receiver
-                                  │
-                                  ▼
-                         Capture Sender Hold
-                                  │
-                                  ▼
-                         Credit Receiver
-                                  │
-                         ┌────────┴────────┐
-                         │                 │
-                      Success            Failure
-                         │                 │
-                         ▼                 ▼
-                      SUCCESS       Compensating Action
-                         │
-                         ▼
-                  Publish Kafka Event
+React Frontend
+      │
+      ▼
+API Gateway :8080
+      │
+      ├── /api/v1/auth/**          → User Service
+      ├── /api/v1/users/**         → User Service
+      ├── /api/v1/wallets/**       → Wallet Service
+      ├── /api/v1/transactions/**  → Transaction Service
+      ├── /api/v1/rewards/**       → Reward Service
+      └── /api/v1/notify/**        → Notification Service
 ```
 
-The **Transaction Service** coordinates the payment workflow with the **Wallet Service**.
-
-If a later operation fails after funds have already been captured, the system performs a **compensating action** to restore the sender's funds.
+This provides a single backend entry point and keeps internal microservice locations hidden from the frontend.
 
 ---
 
-## ⚡ Event-Driven Architecture
+# 💳 Payment Processing
 
-After a successful transaction, the Transaction Service publishes a transaction event to the Kafka topic:
+A payment is coordinated by the **Transaction Service**.
+
+```text
+                    Transaction Request
+                            │
+                            ▼
+                         PENDING
+                            │
+                            ▼
+                   Place Wallet Hold
+                            │
+                            ▼
+                   Verify Receiver
+                            │
+                            ▼
+                  Capture Sender Hold
+                            │
+                            ▼
+                    Credit Receiver
+                            │
+                   ┌────────┴────────┐
+                   │                 │
+                Success            Failure
+                   │                 │
+                   ▼                 ▼
+                SUCCESS      Compensating Action
+                   │
+                   ▼
+            Publish Kafka Event
+```
+
+The Transaction Service coordinates the payment workflow with the Wallet Service.
+
+---
+
+## 💰 Wallet Hold Workflow
+
+Before finalizing a payment, funds can be placed on hold.
+
+```text
+              Available Balance
+                     │
+                     ▼
+                 Place Hold
+                     │
+              ┌──────┴──────┐
+              │             │
+              ▼             ▼
+         Capture Hold   Release Hold
+              │             │
+              ▼             ▼
+       Finalize Funds   Restore Funds
+```
+
+This prevents funds from being finalized before the transaction has successfully completed the required operations.
+
+---
+
+# 🔄 Transaction Reliability
+
+PayVerge incorporates several mechanisms to improve payment reliability.
+
+### Idempotency
+
+Transaction processing includes idempotency handling to prevent duplicate payment processing.
+
+### Wallet Holds
+
+Funds can be reserved before the payment is finalized.
+
+### Compensating Actions
+
+If a later operation fails after funds have already been captured, the system performs a compensating operation to restore the sender's funds.
+
+### Transaction States
+
+Transactions follow an explicit lifecycle:
+
+```text
+                    PENDING
+                       │
+              ┌────────┴────────┐
+              │                 │
+              ▼                 ▼
+           SUCCESS            FAILED
+```
+
+This allows the system to represent the state of a payment throughout its lifecycle.
+
+---
+
+# ⚡ Event-Driven Architecture
+
+After a successful transaction, the Transaction Service publishes an event to Apache Kafka.
+
+The event is published to:
 
 ```text
 txn-initiated
 ```
 
-The event is independently consumed by the Reward and Notification services.
+Two independent Kafka consumer groups process the event.
 
 ```text
                          txn-initiated
@@ -131,47 +240,91 @@ The event is independently consumed by the Reward and Notification services.
             Reward Data            Notification Data
 ```
 
-Separate Kafka consumer groups allow both services to independently process the same transaction event.
+Because Reward Service and Notification Service use different consumer groups, both services independently receive and process the same transaction event.
 
-This keeps reward and notification processing decoupled from the core transaction workflow.
+This keeps secondary processing decoupled from the core payment workflow.
 
 ---
 
-## 🔐 Authentication & Security
+# 🔄 Synchronous Communication
 
-Payverge uses **Spring Security and JWT** for authentication.
-
-### Authentication Flow
+Critical payment operations use synchronous REST communication.
 
 ```text
-              Login
-                │
-                ▼
-        Validate Credentials
-                │
-                ▼
-           Generate JWT
-                │
-                ▼
-        Client stores token
-                │
-                ▼
- Authorization: Bearer <JWT>
-                │
-                ▼
-        JWT Request Filter
-                │
-        ┌───────┼────────┐
-        │       │        │
-     Validate  Extract  Extract
-     Token     User     Role
-        │       │        │
-        └───────┼────────┘
-                ▼
-       SecurityContextHolder
-                │
-                ▼
-        Protected Endpoints
+Transaction Service
+        │
+        │ REST
+        ▼
+Wallet Service
+```
+
+The Transaction Service requires immediate responses for operations such as:
+
+- Checking wallet availability
+- Placing a wallet hold
+- Capturing a hold
+- Releasing a hold
+- Crediting the receiver
+
+This allows the Transaction Service to make decisions based on the current result of wallet operations.
+
+---
+
+# 📢 Asynchronous Communication
+
+Secondary operations use Kafka.
+
+```text
+Transaction Service
+        │
+        │ Kafka Event
+        ▼
+      Kafka
+      /   \
+     ▼     ▼
+ Reward  Notification
+```
+
+Rewards and notifications are therefore processed independently from the main payment workflow.
+
+---
+
+# 🔐 Authentication & Security
+
+PayVerge uses **Spring Security and JWT** for authentication.
+
+## Authentication Flow
+
+```text
+                         Login
+                           │
+                           ▼
+                  Validate Credentials
+                           │
+                           ▼
+                      Generate JWT
+                           │
+                           ▼
+                   Return JWT
+                           │
+                           ▼
+              Authorization: Bearer <JWT>
+                           │
+                           ▼
+                  JWT Request Filter
+                           │
+              ┌────────────┼────────────┐
+              │            │            │
+              ▼            ▼            ▼
+           Validate     Extract       Extract
+            Token       User ID        Role
+              │            │            │
+              └────────────┼────────────┘
+                           ▼
+                 Authenticated Request
+                           │
+                           ▼
+                  Protected API Endpoint
 ```
 
 JWT tokens contain information such as:
@@ -182,97 +335,69 @@ JWT tokens contain information such as:
 - Issued-at timestamp
 - Expiration timestamp
 
-Passwords are protected using **BCrypt**.
+Passwords are protected using **BCrypt hashing**.
 
 ---
 
-## 🧩 Microservices
+# 🚦 Redis Rate Limiting
 
-| Service | Responsibility |
-|---|---|
-| **API Gateway** | Central entry point and request routing |
-| **User Service** | User registration, authentication, and user management |
-| **Wallet Service** | Wallet balances and wallet operations |
-| **Transaction Service** | Payment orchestration and transaction lifecycle |
-| **Reward Service** | Processes transaction events and creates rewards |
-| **Notification Service** | Processes transaction events and stores notifications |
+The API Gateway uses **Redis-backed request rate limiting** for selected APIs.
 
----
-
-## 🔄 Communication Patterns
-
-Payverge uses both synchronous and asynchronous communication.
-
-### Synchronous Communication
-
-The Transaction Service communicates with the Wallet Service during payment processing.
+Currently rate-limited endpoints include:
 
 ```text
-Transaction Service
-        │
-        │ REST
-        ▼
-  Wallet Service
+/api/v1/transactions/**
+/api/v1/rewards/**
+/api/v1/notify/**
 ```
 
-This is used for operations where the transaction workflow needs an immediate result.
-
-### Asynchronous Communication
-
-Once a transaction is successfully processed:
+Redis runs on:
 
 ```text
-Transaction Service
-        │
-        │ Kafka Event
-        ▼
-      Kafka
-     /     \
-    ▼       ▼
-Reward   Notification
+localhost:6379
 ```
 
-This allows secondary operations to happen independently of the main payment workflow.
+The request flow is:
+
+```text
+Client
+  │
+  ▼
+API Gateway
+  │
+  ▼
+RequestRateLimiter
+  │
+  ▼
+Redis
+  │
+  ▼
+Backend Service
+```
+
+Redis maintains the state required by the Gateway's rate-limiting mechanism.
 
 ---
 
-## 🛡️ Transaction Reliability
+# 🧱 Infrastructure
 
-The payment workflow incorporates several mechanisms for reliable transaction processing:
+PayVerge uses Docker Compose for local infrastructure.
 
-### Idempotency
+Currently the infrastructure includes:
 
-Transaction processing includes idempotency handling to prevent duplicate payment processing.
+| Component | Port |
+|---|---:|
+| ZooKeeper | `2181` |
+| Kafka | `9092` |
+| Redis | `6379` |
 
-### Wallet Holds
-
-Funds can first be placed on hold before the transaction is finalized.
-
-```text
-Available Balance
-        │
-        ▼
-    Place Hold
-        │
-        ├───────────────┐
-        ▼               ▼
-   Capture Hold     Release Hold
-        │               │
-        ▼               ▼
-   Final Balance   Restore Availability
-```
-
-### Compensating Actions
-
-If a transaction fails after an operation has already been completed, the system performs a compensating operation to restore consistency.
-
-This provides a **Saga-style approach using compensating actions** rather than relying on a distributed database transaction.
+The application services themselves can be started as individual Spring Boot applications during local development.
 
 ---
 
-## 🛠️ Technology Stack
+# 🛠️ Technology Stack
 
-### Backend
+## Backend
 
 - Java
 - Spring Boot
@@ -280,13 +405,19 @@ This provides a **Saga-style approach using compensating actions** rather than r
 - JWT
 - Spring Data JPA
 - Maven
+- REST APIs
 
-### Messaging
+## Messaging
 
 - Apache Kafka
+- Kafka Consumer Groups
 - ZooKeeper
 
-### Frontend
+## Caching / Rate Limiting
+
+- Redis
+
+## Frontend
 
 - React 19
 - React Router 7
@@ -294,18 +425,20 @@ This provides a **Saga-style approach using compensating actions** rather than r
 - JavaScript
 - Sass (SCSS)
 
-### Infrastructure
+## Infrastructure
 
 - Docker
 - Docker Compose
 
-### Database
+## Database
 
 - H2 Database
 
+> H2 is currently used for local development. A production deployment would use a persistent database configuration.
+
 ---
 
-## 📁 Project Structure
+# 📁 Project Structure
 
 ```text
 payverge/
@@ -317,6 +450,7 @@ payverge/
 │   ├── transaction-service/
 │   ├── reward-service/
 │   ├── notification-service/
+│   │
 │   ├── docker-compose.yml
 │   └── pom.xml
 │
@@ -329,21 +463,22 @@ payverge/
 
 ---
 
-## 🚀 Getting Started
+# 🚀 Getting Started
 
-### Prerequisites
+## Prerequisites
 
-Make sure the following are installed:
+Make sure you have the following installed:
 
 - Java
 - Maven
-- Node.js and npm
+- Node.js
+- npm
 - Docker
 - Git
 
 ---
 
-### 1. Start Kafka Infrastructure
+## 1. Start Infrastructure
 
 Navigate to the backend directory:
 
@@ -351,22 +486,29 @@ Navigate to the backend directory:
 cd backend
 ```
 
-Start Kafka and ZooKeeper:
+Start Kafka, ZooKeeper and Redis:
 
 ```bash
 docker compose up -d
 ```
 
-This starts:
+Verify the containers:
 
-| Component | Port |
-|---|---:|
-| ZooKeeper | `2181` |
-| Kafka | `9092` |
+```bash
+docker ps
+```
+
+You should see:
+
+```text
+Kafka
+ZooKeeper
+Redis
+```
 
 ---
 
-### 2. Build the Backend
+## 2. Build the Backend
 
 From the backend directory:
 
@@ -374,9 +516,55 @@ From the backend directory:
 mvn clean install
 ```
 
-Start the individual Spring Boot services.
+---
 
-The API Gateway is available at:
+## 3. Start the Microservices
+
+Start each Spring Boot service.
+
+### User Service
+
+```bash
+cd backend/user-service
+mvn spring-boot:run
+```
+
+### Wallet Service
+
+```bash
+cd backend/wallet-service
+mvn spring-boot:run
+```
+
+### Transaction Service
+
+```bash
+cd backend/transaction-service
+mvn spring-boot:run
+```
+
+### Reward Service
+
+```bash
+cd backend/reward-service
+mvn spring-boot:run
+```
+
+### Notification Service
+
+```bash
+cd backend/notification-service
+mvn spring-boot:run
+```
+
+### API Gateway
+
+```bash
+cd backend/api-gateway
+mvn spring-boot:run
+```
+
+The API Gateway will be available at:
 
 ```text
 http://localhost:8080
@@ -384,7 +572,7 @@ http://localhost:8080
 
 ---
 
-### 3. Start the Frontend
+# 🎨 Start the Frontend
 
 Navigate to:
 
@@ -404,39 +592,98 @@ Start the development server:
 npm run dev
 ```
 
-The React application communicates with the backend through the API Gateway.
-
----
-
-## 🌐 API Gateway Routing
-
-The frontend communicates with the backend through the API Gateway rather than directly accessing individual backend services.
-
-Examples include:
+The frontend will normally be available at:
 
 ```text
-/auth/**
-/api/users/**
-/api/v1/wallets/**
-/api/transactions/**
-/api/rewards/**
-/api/notify/**
+http://localhost:5173
 ```
-
-This provides a single entry point for the frontend while keeping individual microservices behind the gateway.
 
 ---
 
-## 🧠 Engineering Concepts Demonstrated
+# 🔌 API Routing
 
-Payverge was built to explore practical distributed-system and backend engineering concepts:
+All frontend API requests are sent through the API Gateway.
+
+| API Endpoint | Destination |
+|---|---|
+| `/api/v1/auth/**` | User Service |
+| `/api/v1/users/**` | User Service |
+| `/api/v1/wallets/**` | Wallet Service |
+| `/api/v1/transactions/**` | Transaction Service |
+| `/api/v1/rewards/**` | Reward Service |
+| `/api/v1/notify/**` | Notification Service |
+
+The frontend therefore only needs to communicate with:
+
+```text
+http://localhost:8080
+```
+
+rather than directly accessing individual microservice ports.
+
+---
+
+# 🧪 Example End-to-End Payment
+
+Suppose:
+
+```text
+User 1 → User 2
+Amount → ₹400
+```
+
+The request follows this flow:
+
+```text
+                         React
+                           │
+                           ▼
+                    API Gateway :8080
+                           │
+                           ▼
+                 Transaction Service
+                           │
+                           ▼
+                   Wallet Service
+                           │
+              ┌────────────┴────────────┐
+              │                         │
+        Sender Hold                Receiver
+              │                         │
+              └────────────┬────────────┘
+                           │
+                           ▼
+                     Payment Success
+                           │
+                           ▼
+                      Kafka Event
+                           │
+                 ┌─────────┴─────────┐
+                 ▼                   ▼
+              Reward             Notification
+              Service              Service
+```
+
+For example, the receiver can receive a notification such as:
+
+```text
+💰 ₹400 received from user 1
+```
+
+while the payment sender can receive the corresponding reward according to the application's reward rules.
+
+---
+
+# 🧠 Engineering Concepts Demonstrated
+
+PayVerge was built to explore practical backend and distributed-system concepts:
 
 - Microservices Architecture
 - API Gateway Pattern
-- REST APIs
-- Spring Security
 - JWT Authentication
-- Password Hashing
+- Spring Security
+- BCrypt Password Hashing
+- REST APIs
 - Synchronous Service-to-Service Communication
 - Event-Driven Architecture
 - Apache Kafka
@@ -444,32 +691,71 @@ Payverge was built to explore practical distributed-system and backend engineeri
 - Distributed Transaction Coordination
 - Saga-Style Compensating Actions
 - Idempotent Transaction Processing
-- Wallet Consistency
+- Wallet Holds
 - Transaction State Management
+- Redis-Backed Rate Limiting
 - Dockerized Infrastructure
 - Client-Side Routing
+- React Application Architecture
 
 ---
 
-## 🔮 Future Improvements
+# 📊 Current Project Status
+
+### Implemented
+
+- [x] User registration
+- [x] JWT authentication
+- [x] BCrypt password hashing
+- [x] API Gateway
+- [x] Centralized API routing
+- [x] Wallet creation
+- [x] Add funds
+- [x] Wallet holds
+- [x] Send money
+- [x] Transaction lifecycle
+- [x] Transaction idempotency
+- [x] Compensating payment operations
+- [x] Kafka transaction events
+- [x] Kafka consumer groups
+- [x] Reward processing
+- [x] Notification processing
+- [x] Redis-backed rate limiting
+- [x] React frontend
+- [x] Docker-based infrastructure
+- [x] Unified backend and frontend repository
+
+---
+
+# 🔮 Future Improvements
 
 Potential improvements include:
 
-- Prometheus and Grafana monitoring
-- Kafka retry mechanisms and Dead Letter Topics
+- Production-grade persistent database configuration
+- Prometheus metrics
+- Grafana dashboards
+- Distributed tracing
 - Centralized configuration
-- Improved service resilience and circuit breaking
-- Production-grade database configuration
-- Automated integration and end-to-end testing
+- Kafka retry mechanisms
+- Dead Letter Topics
+- Improved service resilience
+- Circuit breaker implementation
+- Automated unit and integration testing
+- End-to-end testing
 - Kubernetes deployment
-- Fraud detection capabilities
-- Improved observability and distributed tracing
+- CI/CD pipeline
+- Production-grade secret management
+- Fraud detection
+- Improved observability
 
 ---
 
-## 👨‍💻 Author
+# 👨‍💻 Author
 
 **Brajesh Prajapati**
 
-Java Backend Developer  
-Spring Boot • Microservices • Distributed Systems • React
+Java Backend Developer
+
+**Tech Interests**
+
+Java • Spring Boot • Microservices • Distributed Systems • Kafka • React

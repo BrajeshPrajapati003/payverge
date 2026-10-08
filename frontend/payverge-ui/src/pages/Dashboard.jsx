@@ -15,6 +15,8 @@ const Dashboard = () => {
   const [showNotificationsPanel, setShowNotificationsPanel] = useState(false);
   const navigate = useNavigate();
 
+  const BASE_API = "http://localhost:8080/api/v1";
+
   useEffect(() => {
     fetchDashboardData();
     
@@ -48,7 +50,7 @@ const Dashboard = () => {
       }
 
       // Fetch user data
-      const userRes = await fetch(`http://localhost:8080/api/users/${userId}`, {
+      const userRes = await fetch(`http://localhost:8080/api/v1/users/${userId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -76,7 +78,7 @@ const Dashboard = () => {
       }
 
       // Fetch recent transactions
-      const transactionsRes = await fetch(`http://localhost:8080/api/transactions/user/${userId}`, {
+      const transactionsRes = await fetch(`http://localhost:8080/api/v1/transactions/user/${userId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -94,7 +96,7 @@ const Dashboard = () => {
       // Fetch notifications from correct port (8084)
       let userNotifications = [];
       try {
-        const notificationsRes = await fetch(`http://localhost:8080/api/notify/${userId}`, {
+        const notificationsRes = await fetch(`http://localhost:8080/api/v1/notify/${userId}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -114,7 +116,7 @@ const Dashboard = () => {
       // Fetch rewards from correct port (8083)
       let rewardsCount = 0;
       try {
-        const rewardsRes = await fetch(`http://localhost:8080/api/rewards/user/${userId}`, {
+        const rewardsRes = await fetch(`http://localhost:8080/api/v1/rewards/user/${userId}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -154,7 +156,7 @@ const Dashboard = () => {
       const tokenPayload = JSON.parse(atob(token.split('.')[1]));
       const userId = tokenPayload.userId;
 
-      const response = await fetch(`http://localhost:8080/api/notify/${userId}`, {
+      const response = await fetch(`http://localhost:8080/api/v1/notify/${userId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -329,12 +331,46 @@ const Dashboard = () => {
       <aside className="dashboard-sidebar">
         <div className="sidebar-brand">
           <h2>
-            <img 
-              src="/assets/logo.png" 
-              alt="PayVerge Logo" 
-              className="brand-logo" 
-            />
-            PayVerge
+            <span className="brand-icon" aria-hidden="true">
+              <svg
+                viewBox="0 0 40 40"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect width="40" height="40" rx="11" fill="url(#payverge-gradient)" />
+
+                <path
+                  d="M12 14H27C28.657 14 30 15.343 30 17V18C30 19.657 28.657 21 27 21H17V26H25"
+                  stroke="white"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+
+                <path
+                  d="M17 21V27"
+                  stroke="white"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+
+                <defs>
+                  <linearGradient
+                    id="payverge-gradient"
+                    x1="5"
+                    y1="5"
+                    x2="35"
+                    y2="35"
+                    gradientUnits="userSpaceOnUse"
+                  >
+                    <stop stopColor="#003087" />
+                    <stop offset="1" stopColor="#00B9F1" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </span>
+
+            <span>PayVerge</span>
           </h2>
         </div>
 

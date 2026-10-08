@@ -18,6 +18,8 @@ const Header = ({
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showQuickActionsPanel, setShowQuickActionsPanel] = useState(false);
 
+  const BASE_API = "http://localhost:8080/api/v1";
+
   useEffect(() => {
     fetchUserData();
     fetchNotifications();
@@ -31,7 +33,7 @@ const Header = ({
       const tokenPayload = JSON.parse(atob(token.split('.')[1]));
       const userId = tokenPayload.userId;
 
-      const response = await fetch(`http://localhost:8080/api/users/${userId}`, {
+      const response = await fetch(BASE_API + `/users/${userId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -55,7 +57,7 @@ const Header = ({
       const tokenPayload = JSON.parse(atob(token.split('.')[1]));
       const userId = tokenPayload.userId;
 
-      const response = await fetch(`http://localhost:8084/api/notify/${userId}`, {
+      const response = await fetch(BASE_API + `/notify/${userId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

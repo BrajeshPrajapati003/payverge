@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/v1/auth")
 @Tag(name = "User API", description = "Operations related to users")
 public class AuthController {
     private final UserRepository userRepository;

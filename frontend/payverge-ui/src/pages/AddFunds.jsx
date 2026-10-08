@@ -14,6 +14,8 @@ const AddFunds = () => {
   const [walletBalance, setWalletBalance] = useState(0);
   const [creditedAmount, setCreditedAmount] = useState('');
 
+  const BASE_API = "http://localhost:8080/api/v1";
+
 
   useEffect(() => {
     fetchWalletBalance();
@@ -25,7 +27,7 @@ const AddFunds = () => {
       const tokenPayload = JSON.parse(atob(token.split('.')[1]));
       const userId = tokenPayload.userId;
       
-      const response = await fetch(`http://localhost:8080/api/v1/wallets/${userId}`, {
+      const response = await fetch(`/wallets/${userId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -81,7 +83,7 @@ const AddFunds = () => {
         amount: parseFloat(formData.amount)
       };
 
-      const response = await fetch('http://localhost:8080/api/v1/wallets/credit', {
+      const response = await fetch(BASE_API + '/wallets/credit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

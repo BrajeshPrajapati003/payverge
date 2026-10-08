@@ -8,6 +8,8 @@ const Rewards = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showRedeemPopup, setShowRedeemPopup] = useState(false);
 
+  const BASE_API = "http://localhost:8080/api/v1";
+
   useEffect(() => {
     fetchRewards();
   }, []);
@@ -18,7 +20,7 @@ const Rewards = () => {
       const tokenPayload = JSON.parse(atob(token.split('.')[1]));
       const userId = tokenPayload.userId;
 
-      const response = await fetch(`http://localhost:8080/api/rewards/user/${userId}`, {
+      const response = await fetch(BASE_API + `/rewards/user/${userId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

@@ -59,23 +59,6 @@ public class WalletService {
                 saved.getAvailableBalance()
         );
 
-//        If two requests hit simultaneously: both may pass findByUserId() -> so add DB + fallback protection
-
-//        try {
-//            return createWalletLogic(request);
-//        } catch (DataIntegrityViolationException ex) {
-//            // 🔁 fallback: fetch existing wallet
-//            Wallet wallet = walletRepository.findByUserId(request.getUserId())
-//                    .orElseThrow(() -> ex);
-//
-//            return new WalletResponse(
-//                    wallet.getId(),
-//                    wallet.getUserId(),
-//                    wallet.getCurrency(),
-//                    wallet.getBalance(),
-//                    wallet.getAvailableBalance()
-//            );
-//        }
     }
 
     @Transactional

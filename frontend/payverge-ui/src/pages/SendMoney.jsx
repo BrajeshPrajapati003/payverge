@@ -16,6 +16,8 @@ const SendMoney = () => {
   const [errorTitle, setErrorTitle] = useState('');
   const [errorDescription, setErrorDescription] = useState('');
 
+  const BASE_API = "http://localhost:8080/api/v1";
+
   useEffect(() => {
     fetchUsers();
     fetchRecentTransactions();
@@ -24,7 +26,7 @@ const SendMoney = () => {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:8080/api/users/all', {
+      const response = await fetch(BASE_API + '/users/all', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -46,7 +48,7 @@ const SendMoney = () => {
       const tokenPayload = JSON.parse(atob(token.split('.')[1]));
       const userId = tokenPayload.userId;
       
-      const response = await fetch(`http://localhost:8080/api/transactions/user/${userId}`, {
+      const response = await fetch(BASE_API + `/transactions/user/${userId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -68,7 +70,7 @@ const SendMoney = () => {
   const fetchUserRewards = async (userId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8080/api/rewards/user/${userId}`, {
+      const response = await fetch(BASE_API + `/rewards/user/${userId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -158,7 +160,7 @@ const SendMoney = () => {
         amount: parseFloat(formData.amount)
       };
 
-      const response = await fetch('http://localhost:8080/api/transactions/create', {
+      const response = await fetch(BASE_API + '/transactions/create', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

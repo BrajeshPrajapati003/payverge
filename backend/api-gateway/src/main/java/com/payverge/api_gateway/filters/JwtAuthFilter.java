@@ -17,8 +17,8 @@ import java.util.List;
 public class JwtAuthFilter implements GlobalFilter, Ordered {
 
     private static final List<String> PUBLIC_PATHS = List.of(
-            "/auth/signup",
-            "/auth/login"
+            "/api/v1/auth/signup",
+            "/api/v1/auth/login"
     );
 
     @Override
@@ -64,7 +64,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
             // Add user email to headers for downstream services
             var mutatedRequest = exchange.getRequest().mutate()
                     .header("X-User-Email", claims.getSubject())
-                    .header("X-ser-Id", claims.get("user-id", String.class))
+                    .header("X-User-Id", claims.get("userId", Long.class).toString())
                     .header("X-User-Role", claims.get("role", String.class))
                     .build();
 

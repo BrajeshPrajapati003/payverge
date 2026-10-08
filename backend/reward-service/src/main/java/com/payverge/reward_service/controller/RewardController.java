@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/rewards/")
+@RequestMapping("/api/v1/rewards")
 public class RewardController {
     private final RewardRepository rewardRepository;
 

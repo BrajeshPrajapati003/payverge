@@ -30,7 +30,7 @@ public class NotificationConsumer {
         System.out.println("📥 Received transaction: " + transaction);
 
         Notification notification = new Notification();
-        notification.setUserId(transaction.getSenderId());
+        notification.setUserId(transaction.getReceiverId());
         notification.setMessage("💰 ₹" + transaction.getAmount() + " received from user " + transaction.getSenderId());
         notification.setSentAt(LocalDateTime.now());
 

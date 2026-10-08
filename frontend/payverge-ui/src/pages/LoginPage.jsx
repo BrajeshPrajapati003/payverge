@@ -7,14 +7,16 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const { login } = useAuth(); 
+  const { login } = useAuth();
+
+  const BASE_API = "http://localhost:8080/api/v1";
 
   const handleLogin = async (e) => {
     e.preventDefault();
     const payload = { email, password };
   
     try {
-      const response = await fetch("http://localhost:8080/auth/login", {
+      const response = await fetch(BASE_API + "/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
